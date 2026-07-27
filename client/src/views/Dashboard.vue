@@ -639,6 +639,9 @@ export default {
       const { currentLocale } = useI18n()
       const locale = currentLocale.value === 'ja' ? 'ja-JP' : 'en-US'
       const date = new Date(dateString)
+      // A malformed date would otherwise render as the literal "Invalid Date"
+      // in the table, with nothing logged to point at the bad record.
+      if (isNaN(date.getTime())) return '-'
       return date.toLocaleDateString(locale, { month: 'short', day: 'numeric', year: 'numeric' })
     }
 

@@ -609,7 +609,11 @@ def create_purchase_order(request: CreatePurchaseOrderRequest):
 
     # One purchase order per backlog item: the lookup endpoint is keyed by
     # backlog_item_id, so a second order would be unreachable through the API.
-    if backlog_item.get("has_purchase_order"):
+    # Derived from purchase_orders rather than from the backlog item's own
+    # has_purchase_order field, because /api/backlog recomputes that field the
+    # same way on every request - the list is the single source of truth, and
+    # the field on the seed data is never read.
+    if any(po["backlog_item_id"] == request.backlog_item_id for po in purchase_orders):
         raise HTTPException(
             status_code=409,
             detail=f"Backlog item {request.backlog_item_id} already has a purchase order"
@@ -623,9 +627,6 @@ def create_purchase_order(request: CreatePurchaseOrderRequest):
     }
 
     purchase_orders.append(purchase_order)
-    # The backlog view reads this flag to stop offering "raise a PO" on an item
-    # that already has one, so it has to move in step with the list above.
-    backlog_item["has_purchase_order"] = True
     return purchase_order
 
 if __name__ == "__main__":

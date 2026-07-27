@@ -18,8 +18,6 @@ def reset_runtime_state():
         main.tasks.clear()
         main.purchase_orders.clear()
         main.next_task_id = 1
-        for item in main.backlog_items:
-            item["has_purchase_order"] = False
 
     clear()
     yield
