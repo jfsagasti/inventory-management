@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Arquitectura · Factory Inventory Management System</title>
+<style>
+  :root{
+    --bg:#ffffff; --bg-alt:#f8fafc; --surface:#ffffff; --border:#e2e8f0;
+    --text:#0f172a; --muted:#64748b; --faint:#94a3b8;
+    --accent:#3b82f6; --accent-soft:#eff6ff;
+    --green:#16a34a; --green-soft:#f0fdf4;
+    --amber:#d97706; --amber-soft:#fffbeb;
+    --red:#dc2626; --red-soft:#fef2f2;
+    --violet:#7c3aed; --violet-soft:#f5f3ff;
+    --mono:ui-monospace,SFMono-Regular,"SF Mono",Menlo,Consolas,monospace;
+  }
+  @media (prefers-color-scheme:dark){
+    :root{
+      --bg:#0f172a; --bg-alt:#111c33; --surface:#1a2438; --border:#2b3950;
+      --text:#e8eefb; --muted:#93a3bd; --faint:#64748b;
+      --accent:#60a5fa; --accent-soft:#1a2c4a;
+      --green:#4ade80; --green-soft:#14301f;
+      --amber:#fbbf24; --amber-soft:#33260c;
+      --red:#f87171; --red-soft:#3a1a1a;
+      --violet:#a78bfa; --violet-soft:#241c47;
+    }
+  }
+  *{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%}
+  body{
+    margin:0; background:var(--bg); color:var(--text);
+    font:16px/1.65 -apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Roboto,sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:1080px; margin:0 auto; padding:0 24px 96px}
+
+  /* ---------- Cabecera ---------- */
+  header{border-bottom:1px solid var(--border); background:var(--bg-alt); margin-bottom:56px}
+  .head-inner{max-width:1080px; margin:0 auto; padding:56px 24px 44px}
+  .eyebrow{
+    font-size:12px; font-weight:600; letter-spacing:.1em; text-transform:uppercase;
+    color:var(--accent); margin:0 0 14px
+  }
+  h1{font-size:clamp(28px,4.5vw,42px); line-height:1.15; letter-spacing:-.022em; margin:0 0 14px; font-weight:700}
+  .lede{font-size:clamp(16px,2vw,18px); color:var(--muted); max-width:62ch; margin:0}
+  .meta{display:flex; flex-wrap:wrap; gap:10px; margin-top:26px}
+  .pill{
+    font:600 12px/1 var(--mono); padding:7px 11px; border-radius:999px;
+    background:var(--surface); border:1px solid var(--border); color:var(--muted)
+  }
+
+  /* ---------- Secciones ---------- */
+  section{margin-bottom:64px; scroll-margin-top:24px}
+  h2{
+    font-size:13px; font-weight:700; letter-spacing:.09em; text-transform:uppercase;
+    color:var(--muted); margin:0 0 22px; padding-bottom:12px; border-bottom:1px solid var(--border)
+  }
+  h3{font-size:17px; font-weight:650; letter-spacing:-.01em; margin:0 0 10px}
+  p{margin:0 0 16px; color:var(--muted); max-width:72ch}
+  p.lead{color:var(--text)}
+  code{font:500 .875em/1.4 var(--mono); background:var(--bg-alt); border:1px solid var(--border);
+       padding:.12em .42em; border-radius:5px; color:var(--text); white-space:nowrap}
+  a{color:var(--accent)}
+
+  /* ---------- Rejillas / tarjetas ---------- */
+  .grid{display:grid; gap:16px}
+  .g2{grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
+  .g3{grid-template-columns:repeat(auto-fit,minmax(212px,1fr))}
+  .card{background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:20px}
+  .card .k{font:600 11px/1 var(--mono); letter-spacing:.06em; text-transform:uppercase; color:var(--faint); margin-bottom:9px}
+  .card ul{margin:0; padding-left:18px; color:var(--muted); font-size:14.5px}
+  .card li{margin-bottom:5px}
+  .card li:last-child{margin-bottom:0}
+
+  .stat{background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:18px 20px}
+  .stat .n{font-size:27px; font-weight:700; letter-spacing:-.025em; line-height:1.1}
+  .stat .l{font-size:12.5px; color:var(--muted); margin-top:5px}
+
+  /* ---------- Diagramas ---------- */
+  .diagram{
+    background:var(--bg-alt); border:1px solid var(--border); border-radius:12px;
+    padding:24px; overflow-x:auto
+  }
+  .diagram svg{display:block; min-width:640px; width:100%; height:auto}
+  .cap{font-size:13px; color:var(--faint); margin:12px 0 0; text-align:center}
+
+  /* ---------- Flujo de datos ---------- */
+  .flow{list-style:none; margin:0; padding:0; counter-reset:s}
+  .flow li{
+    counter-increment:s; position:relative; padding:0 0 24px 46px;
+    border-left:2px solid var(--border); margin-left:14px
+  }
+  .flow li:last-child{border-left-color:transparent; padding-bottom:0}
+  .flow li::before{
+    content:counter(s); position:absolute; left:-15px; top:-2px;
+    width:28px; height:28px; border-radius:50%;
+    background:var(--accent); color:#fff;
+    font:700 12px/28px var(--mono); text-align:center
+  }
+  .flow h3{margin-bottom:5px}
+  .flow p{margin:0; font-size:14.5px}
+
+  /* ---------- Tablas ---------- */
+  .tw{overflow-x:auto; border:1px solid var(--border); border-radius:12px; background:var(--surface)}
+  table{border-collapse:collapse; width:100%; min-width:620px; font-size:14px}
+  th{
+    text-align:left; font:600 11px/1 var(--mono); letter-spacing:.06em; text-transform:uppercase;
+    color:var(--faint); padding:13px 16px; border-bottom:1px solid var(--border);
+    background:var(--bg-alt); white-space:nowrap
+  }
+  td{padding:12px 16px; border-bottom:1px solid var(--border); color:var(--muted); vertical-align:top}
+  tr:last-child td{border-bottom:none}
+  td.ep{font:500 13px/1.5 var(--mono); color:var(--text); white-space:nowrap}
+  .tag{
+    display:inline-block; font:600 10.5px/1 var(--mono); padding:4px 7px; border-radius:4px;
+    background:var(--green-soft); color:var(--green); letter-spacing:.04em
+  }
+  .tag.post{background:var(--amber-soft); color:var(--amber)}
+  .tag.none{background:var(--bg-alt); color:var(--faint)}
+
+  /* ---------- Árbol de ficheros ---------- */
+  .tree{
+    background:var(--surface); border:1px solid var(--border); border-radius:12px;
+    padding:20px 22px; font:13px/1.85 var(--mono); color:var(--muted);
+    overflow-x:auto; white-space:pre; margin:0
+  }
+  .tree b{color:var(--text); font-weight:600}
+  .tree i{color:var(--faint); font-style:normal}
+
+  /* ---------- Avisos ---------- */
+  .note{
+    border:1px solid var(--border); border-left:3px solid var(--amber);
+    background:var(--amber-soft); border-radius:0 10px 10px 0; padding:16px 20px; margin-bottom:14px
+  }
+  .note.info{border-left-color:var(--accent); background:var(--accent-soft)}
+  .note h3{font-size:15px; margin-bottom:6px}
+  .note p{margin:0; font-size:14.5px; color:var(--text); opacity:.82}
+
+  footer{border-top:1px solid var(--border); padding-top:22px; font-size:13px; color:var(--faint)}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="head-inner">
+    <p class="eyebrow">Documentación de arquitectura</p>
+    <h1>Factory Inventory Management System</h1>
+    <p class="lede">
+      Aplicación full-stack de demostración para gestión de inventario industrial: SPA en Vue&nbsp;3
+      sobre una API REST en FastAPI, con datos simulados en memoria y sin base de datos.
+    </p>
+    <div class="meta">
+      <span class="pill">Vue 3.4</span>
+      <span class="pill">Vite 5</span>
+      <span class="pill">FastAPI</span>
+      <span class="pill">Python 3.11+</span>
+      <span class="pill">Sin base de datos</span>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <!-- ===================== VISIÓN GENERAL ===================== -->
+  <section>
+    <h2>Visión general</h2>
+    <p class="lead">
+      El sistema se reparte en dos procesos independientes que se comunican exclusivamente por HTTP.
+      No hay renderizado en servidor, ni sesiones, ni capa de persistencia: el backend carga siete
+      ficheros JSON al arrancar y los sirve desde memoria.
+    </p>
+    <div class="grid g3">
+      <div class="stat"><div class="n">2</div><div class="l">Procesos (puertos 3000 y 8001)</div></div>
+      <div class="stat"><div class="n">23</div><div class="l">Endpoints REST expuestos</div></div>
+      <div class="stat"><div class="n">7</div><div class="l">Vistas enrutadas</div></div>
+      <div class="stat"><div class="n">9</div><div class="l">Componentes reutilizables</div></div>
+      <div class="stat"><div class="n">3</div><div class="l">Composables compartidos</div></div>
+      <div class="stat"><div class="n">359</div><div class="l">Registros en los JSON semilla</div></div>
+    </div>
+  </section>
+
+  <!-- ===================== ARQUITECTURA ===================== -->
+  <section>
+    <h2>Arquitectura del sistema</h2>
+    <div class="diagram">
+      <svg viewBox="0 0 960 470" xmlns="http://www.w3.org/2000/svg" role="img"
+           aria-label="Diagrama de arquitectura: navegador con SPA Vue, API FastAPI y ficheros JSON">
+        <defs>
+          <marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M0 0 L10 5 L0 10 z" fill="currentColor"/>
+          </marker>
+        </defs>
+
+        <!-- ---- Navegador ---- -->
+        <g>
+          <rect x="20" y="20" width="376" height="430" rx="12"
+                fill="var(--accent-soft)" stroke="var(--accent)" stroke-width="1.5" stroke-dasharray="5 4"/>
+          <text x="40" y="47" font-size="12" font-weight="700" fill="var(--accent)"
+                letter-spacing="1.2" font-family="var(--mono)">NAVEGADOR · localhost:3000</text>
+
+          <rect x="40" y="62" width="336" height="70" rx="9" fill="var(--surface)" stroke="var(--border)"/>
+          <text x="58" y="88" font-size="14.5" font-weight="650" fill="var(--text)">App.vue</text>
+          <text x="58" y="108" font-size="12" fill="var(--muted)">Layout, navegación, estilos globales</text>
+          <text x="58" y="124" font-size="12" fill="var(--muted)">FilterBar · ProfileMenu · LanguageSwitcher</text>
+
+          <rect x="40" y="146" width="336" height="112" rx="9" fill="var(--surface)" stroke="var(--border)"/>
+          <text x="58" y="171" font-size="14.5" font-weight="650" fill="var(--text)">Vistas · vue-router</text>
+          <text x="58" y="192" font-size="11.5" font-family="var(--mono)" fill="var(--muted)">/ Dashboard   /inventory Inventory</text>
+          <text x="58" y="211" font-size="11.5" font-family="var(--mono)" fill="var(--muted)">/orders Orders   /demand Demand</text>
+          <text x="58" y="230" font-size="11.5" font-family="var(--mono)" fill="var(--muted)">/spending · /reports · /restocking</text>
+          <text x="58" y="249" font-size="11.5" fill="var(--faint)">Gráficos SVG propios · sin librerías</text>
+
+          <rect x="40" y="272" width="336" height="86" rx="9" fill="var(--surface)" stroke="var(--border)"/>
+          <text x="58" y="297" font-size="14.5" font-weight="650" fill="var(--text)">Composables (estado singleton)</text>
+          <text x="58" y="318" font-size="11.5" font-family="var(--mono)" fill="var(--muted)">useFilters · useI18n · useAuth</text>
+          <text x="58" y="337" font-size="11.5" fill="var(--faint)">refs a nivel de módulo, compartidos por toda la app</text>
+          <text x="58" y="351" font-size="11.5" fill="var(--faint)">useI18n persiste el idioma en localStorage</text>
+
+          <rect x="40" y="372" width="336" height="62" rx="9" fill="var(--surface)" stroke="var(--accent)" stroke-width="1.5"/>
+          <text x="58" y="396" font-size="14.5" font-weight="650" fill="var(--text)">api.js · cliente axios</text>
+          <text x="58" y="416" font-size="11.5" fill="var(--muted)">Único punto de salida HTTP · URL base fija</text>
+        </g>
+
+        <!-- ---- Flecha HTTP ---- -->
+        <g color="var(--faint)">
+          <line x1="404" y1="235" x2="556" y2="235" stroke="currentColor" stroke-width="1.6" marker-end="url(#ar)" marker-start="url(#ar)"/>
+        </g>
+        <text x="480" y="222" font-size="11.5" font-weight="650" text-anchor="middle" fill="var(--muted)" font-family="var(--mono)">HTTP · JSON</text>
+        <text x="480" y="255" font-size="11" text-anchor="middle" fill="var(--faint)">CORS: allow_origins ["*"]</text>
+
+        <!-- ---- Servidor ---- -->
+        <g>
+          <rect x="564" y="20" width="376" height="430" rx="12"
+                fill="var(--green-soft)" stroke="var(--green)" stroke-width="1.5" stroke-dasharray="5 4"/>
+          <text x="584" y="47" font-size="12" font-weight="700" fill="var(--green)"
+                letter-spacing="1.2" font-family="var(--mono)">SERVIDOR · localhost:8001</text>
+
+          <rect x="584" y="62" width="336" height="70" rx="9" fill="var(--surface)" stroke="var(--border)"/>
+          <text x="602" y="87" font-size="14.5" font-weight="650" fill="var(--text)">uvicorn + FastAPI</text>
+          <text x="602" y="107" font-size="12" fill="var(--muted)">CORSMiddleware · docs automáticos en /docs</text>
+          <text x="602" y="124" font-size="12" fill="var(--muted)">Un solo módulo: main.py</text>
+
+          <rect x="584" y="146" width="336" height="88" rx="9" fill="var(--surface)" stroke="var(--border)"/>
+          <text x="602" y="171" font-size="14.5" font-weight="650" fill="var(--text)">Capa de filtrado</text>
+          <text x="602" y="192" font-size="11" font-family="var(--mono)" fill="var(--muted)">apply_filters() → warehouse, category, status</text>
+          <text x="602" y="210" font-size="11" font-family="var(--mono)" fill="var(--muted)">filter_by_month() → mes o trimestre</text>
+          <text x="602" y="227" font-size="11" fill="var(--faint)">Comprensiones de lista sobre copias en memoria</text>
+
+          <rect x="584" y="248" width="336" height="72" rx="9" fill="var(--surface)" stroke="var(--border)"/>
+          <text x="602" y="273" font-size="14.5" font-weight="650" fill="var(--text)">Modelos Pydantic</text>
+          <text x="602" y="293" font-size="11" font-family="var(--mono)" fill="var(--muted)">InventoryItem · Order · DemandForecast · Task</text>
+          <text x="602" y="311" font-size="11" font-family="var(--mono)" fill="var(--muted)">BacklogItem · PurchaseOrder · Restocking*</text>
+
+          <rect x="584" y="334" width="336" height="52" rx="9" fill="var(--surface)" stroke="var(--border)"/>
+          <text x="602" y="358" font-size="14.5" font-weight="650" fill="var(--text)">mock_data.py</text>
+          <text x="602" y="376" font-size="11.5" fill="var(--muted)">Carga los JSON una vez, al importar el módulo</text>
+
+          <rect x="584" y="398" width="336" height="36" rx="9" fill="var(--bg-alt)" stroke="var(--border)" stroke-dasharray="4 3"/>
+          <text x="602" y="421" font-size="11.5" font-family="var(--mono)" fill="var(--muted)">server/data/*.json  —  7 ficheros semilla</text>
+        </g>
+
+        <!-- Conector interno servidor -->
+        <g color="var(--faint)">
+          <line x1="752" y1="386" x2="752" y2="396" stroke="currentColor" stroke-width="1.4" marker-end="url(#ar)"/>
+          <line x1="752" y1="320" x2="752" y2="332" stroke="currentColor" stroke-width="1.4" marker-start="url(#ar)"/>
+          <line x1="752" y1="234" x2="752" y2="246" stroke="currentColor" stroke-width="1.4" marker-start="url(#ar)"/>
+          <line x1="752" y1="132" x2="752" y2="144" stroke="currentColor" stroke-width="1.4" marker-start="url(#ar)"/>
+        </g>
+        <!-- Conector interno cliente -->
+        <g color="var(--faint)">
+          <line x1="208" y1="132" x2="208" y2="144" stroke="currentColor" stroke-width="1.4" marker-end="url(#ar)"/>
+          <line x1="208" y1="258" x2="208" y2="270" stroke="currentColor" stroke-width="1.4" marker-end="url(#ar)" marker-start="url(#ar)"/>
+          <line x1="208" y1="358" x2="208" y2="370" stroke="currentColor" stroke-width="1.4" marker-end="url(#ar)"/>
+        </g>
+      </svg>
+    </div>
+    <p class="cap">Dos procesos, un único contrato HTTP. El estado vive en memoria del servidor y se reinicia con él.</p>
+  </section>
+
+  <!-- ===================== STACK ===================== -->
+  <section>
+    <h2>Stack tecnológico</h2>
+    <div class="grid g2">
+      <div class="card">
+        <div class="k">Frontend · puerto 3000</div>
+        <ul>
+          <li><b>Vue 3.4</b> con Composition API exclusivamente (sin Options API)</li>
+          <li><b>Vite 5</b> como dev server y bundler</li>
+          <li><b>vue-router 4</b> en modo history, 7 rutas</li>
+          <li><b>axios</b> centralizado en <code>api.js</code></li>
+          <li>Sin Pinia/Vuex: el estado global son <code>ref()</code> a nivel de módulo</li>
+          <li>Sin librería de gráficos: SVG escrito a mano</li>
+          <li>i18n propio (EN/JA) con moneda derivada del idioma</li>
+        </ul>
+      </div>
+      <div class="card">
+        <div class="k">Backend · puerto 8001</div>
+        <ul>
+          <li><b>FastAPI</b> sobre <b>uvicorn</b>, Python 3.11+</li>
+          <li><b>Pydantic v2</b> para validación de respuestas</li>
+          <li><b>uv</b> como gestor de dependencias y entorno</li>
+          <li>Datos en memoria desde <code>server/data/*.json</code></li>
+          <li>Sin ORM, sin base de datos, sin migraciones</li>
+          <li>Sin autenticación; CORS abierto a todos los orígenes</li>
+          <li><b>pytest</b> + <code>TestClient</code> en <code>tests/backend/</code></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== FLUJO DE DATOS ===================== -->
+  <section>
+    <h2>Flujo de datos</h2>
+    <p class="lead">
+      Los cuatro filtros de la barra superior —periodo, ubicación, categoría y estado— son el eje
+      del sistema: viven en un composable compartido y se propagan a cada vista como parámetros de query.
+    </p>
+    <ol class="flow">
+      <li>
+        <h3>El usuario cambia un filtro</h3>
+        <p><code>FilterBar.vue</code> escribe en los <code>ref</code> de <code>useFilters.js</code>. Al declararse
+        fuera de la función del composable, esos refs son un singleton: todas las vistas leen la misma instancia.</p>
+      </li>
+      <li>
+        <h3>La vista reacciona y recarga</h3>
+        <p>Cada vista observa los filtros y llama a <code>getCurrentFilters()</code>, que devuelve
+        <code>{ warehouse, category, status, month }</code> traduciendo el periodo al formato que espera la API.</p>
+      </li>
+      <li>
+        <h3>api.js construye la petición</h3>
+        <p>Los valores <code>'all'</code> se omiten del <code>URLSearchParams</code>, de modo que un filtro
+        inactivo simplemente no viaja en la URL.</p>
+      </li>
+      <li>
+        <h3>FastAPI filtra en memoria</h3>
+        <p><code>apply_filters()</code> encadena comparaciones sobre las listas cargadas —categoría y estado
+        sin distinguir mayúsculas— y <code>filter_by_month()</code> resuelve tanto meses sueltos
+        (<code>2025-03</code>) como trimestres (<code>Q1-2025</code>) vía <code>QUARTER_MAP</code>.</p>
+      </li>
+      <li>
+        <h3>Pydantic valida la salida</h3>
+        <p>El <code>response_model</code> de cada endpoint recorta y comprueba los campos antes de serializar.
+        Si un JSON deja de encajar con su modelo, el error salta aquí.</p>
+      </li>
+      <li>
+        <h3>La vista deriva y pinta</h3>
+        <p>Los datos crudos se guardan en <code>ref</code>; los KPIs, agregados y series de los gráficos se
+        calculan en <code>computed</code>, que se recachean solos cuando cambia el origen.</p>
+      </li>
+    </ol>
+  </section>
+
+  <!-- ===================== API ===================== -->
+  <section>
+    <h2>Superficie de la API</h2>
+    <div class="tw">
+      <table>
+        <thead>
+          <tr><th>Endpoint</th><th>Filtros admitidos</th><th>Devuelve</th></tr>
+        </thead>
+        <tbody>
+          <tr><td class="ep"><span class="tag">GET</span> /</td><td><span class="tag none">—</span></td><td>Metadatos y versión de la API</td></tr>
+          <tr><td class="ep"><span class="tag">GET</span> /api/inventory</td><td>warehouse, category</td><td>40 artículos de inventario</td></tr>
+          <tr><td class="ep"><span class="tag">GET</span> /api/inventory/{id}</td><td><span class="tag none">—</span></td><td>Un artículo · 404 si no existe</td></tr>
+          <tr><td class="ep"><span class="tag">GET</span> /api/orders</td><td>warehouse, category, status, month</td><td>250 pedidos</td></tr>
+          <tr><td class="ep"><span class="tag">GET</span> /api/orders/{id}</td><td><span class="tag none">—</span></td><td>Un pedido · 404 si no existe</td></tr>
+          <tr><td class="ep"><span class="tag">GET</span> /api/demand</td><td><span class="tag none">—</span></td><td>9 previsiones de demanda</td></tr>
+          <tr><td class="ep"><span class="tag">GET</span> /api/backlog</td><td><span class="tag none">—</span></td><td>4 ítems pendientes, con flag <code>has_purchase_order</code></td></tr>
+          <tr><td class="ep"><span class="tag">GET</span> /api/dashboard/summary</td><td>warehouse, category, status, month</td><td>Valor de inventario, stock bajo, pedidos pendientes</td></tr>
+          <tr><td class="ep"><span class="tag">GET</span> /api/spending/summary</td><td><span class="tag none">—</span></td><td>Resumen de gasto</td></tr>
+          <tr><td class="ep"><span class="tag">GET</span> /api/spending/monthly</td><td><span class="tag none">—</span></td><td>Gasto mes a mes</td></tr>
+          <tr><td class="ep"><span class="tag">GET</span> /api/spending/categories</td><td><span class="tag none">—</span></td><td>Gasto por categoría</td></tr>
+          <tr><td class="ep"><span class="tag">GET</span> /api/spending/transactions</td><td><span class="tag none">—</span></td><td>56 transacciones recientes</td></tr>
+          <tr><td class="ep"><span class="tag">GET</span> /api/reports/quarterly</td><td><span class="tag none">—</span></td><td>Agregados por trimestre y tasa de cumplimiento</td></tr>
+          <tr><td class="ep"><span class="tag">GET</span> /api/reports/monthly-trends</td><td><span class="tag none">—</span></td><td>Tendencias mes a mes</td></tr>
+          <tr><td class="ep"><span class="tag">GET</span> /api/restocking/recommendations</td><td>budget</td><td>Plan de reposición: seleccionados, excluidos y presupuesto máximo útil</td></tr>
+          <tr><td class="ep"><span class="tag">GET</span> /api/restocking/orders</td><td><span class="tag none">—</span></td><td>Pedidos de reposición de esta sesión, del más reciente al más antiguo</td></tr>
+          <tr><td class="ep"><span class="tag post">POST</span> /api/restocking/orders</td><td><span class="tag none">—</span></td><td>Crea el pedido y calcula la entrega según el plazo más largo</td></tr>
+          <tr><td class="ep"><span class="tag">GET</span> /api/tasks</td><td><span class="tag none">—</span></td><td>Tareas creadas en esta sesión</td></tr>
+          <tr><td class="ep"><span class="tag post">POST</span> /api/tasks</td><td><span class="tag none">—</span></td><td>Crea una tarea · 400 si el título viene vacío</td></tr>
+          <tr><td class="ep"><span class="tag post">PATCH</span> /api/tasks/{id}</td><td><span class="tag none">—</span></td><td>Alterna entre pendiente y completada · 404 si no existe</td></tr>
+          <tr><td class="ep"><span class="tag post">DELETE</span> /api/tasks/{id}</td><td><span class="tag none">—</span></td><td>Elimina la tarea · 404 si no existe</td></tr>
+          <tr><td class="ep"><span class="tag">GET</span> /api/purchase-orders/{backlog_item_id}</td><td><span class="tag none">—</span></td><td>Orden de compra de un ítem pendiente · 404 si no la tiene</td></tr>
+          <tr><td class="ep"><span class="tag post">POST</span> /api/purchase-orders</td><td><span class="tag none">—</span></td><td>Crea la orden y marca <code>has_purchase_order</code> en el backlog</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p style="margin-top:14px;font-size:14px">
+      Los datos semilla siguen siendo de solo lectura. Lo que se escribe —tareas, órdenes de compra y pedidos de
+      reposición— vive en listas en memoria dentro de <code>main.py</code> y se pierde al reiniciar el servidor.
+    </p>
+  </section>
+
+  <!-- ===================== ESTRUCTURA ===================== -->
+  <section>
+    <h2>Estructura del proyecto</h2>
+    <pre class="tree"><b>client/</b>
+├── <b>src/</b>
+│   ├── <b>views/</b>            <i>7 páginas enrutadas + Backlog.vue (sin ruta)</i>
+│   │   ├── Dashboard.vue    <i>1.271 líneas — el fichero más grande</i>
+│   │   ├── Spending.vue     <i>852 líneas</i>
+│   │   └── Reports.vue · Inventory.vue · Orders.vue · Demand.vue · Restocking.vue
+│   ├── <b>components/</b>       <i>9 componentes: barra de filtros, modales, perfil</i>
+│   ├── <b>composables/</b>      <i>useFilters · useI18n · useAuth</i>
+│   ├── <b>locales/</b>          <i>en.js · ja.js</i>
+│   ├── <b>utils/</b>currency.js
+│   ├── api.js               <i>Cliente axios — única salida HTTP</i>
+│   └── main.js              <i>Arranque de la app y definición de rutas</i>
+├── .npmrc                   <i>Fija el registro público de npm</i>
+└── vite.config.js           <i>Puerto 3000</i>
+
+<b>server/</b>
+├── main.py                  <i>Endpoints, modelos y filtros — todo en un módulo</i>
+├── mock_data.py             <i>Carga los JSON al importarse</i>
+├── generate_data.py         <i>Generador de los datos semilla</i>
+├── <b>data/</b>                 <i>7 ficheros JSON</i>
+└── pyproject.toml           <i>Dependencias gestionadas con uv</i>
+
+<b>tests/backend/</b>            <i>pytest + FastAPI TestClient</i>
+<b>scripts/</b>                  <i>start.sh · stop.sh</i></pre>
+  </section>
+
+  <!-- ===================== OBSERVACIONES ===================== -->
+  <section>
+    <h2>Observaciones sobre el estado actual</h2>
+
+    <div class="note info">
+      <h3>Las tareas llegan de dos sitios a la vez</h3>
+      <p><code>/api/tasks</code> ya está implementado, pero arranca vacío: las cuatro tareas que se ven al abrir
+      el modal son datos estáticos de <code>useAuth.js</code>, y <code>App.vue</code> las fusiona con las del
+      backend. Por eso los ids del servidor van prefijados (<code>task-1</code>): los de la demo son enteros
+      1-4 y un id repetido haría que se marcase o se borrase la tarea equivocada.</p>
+    </div>
+
+    <div class="note">
+      <h3><code>Backlog.vue</code> no está enrutado</h3>
+      <p>La vista existe y el endpoint <code>/api/backlog</code> funciona, pero <code>main.js</code> no registra
+      ninguna ruta hacia ella, así que no hay forma de llegar navegando.</p>
+    </div>
+
+    <div class="note info">
+      <h3>Los filtros de inventario no tienen dimensión temporal</h3>
+      <p><code>/api/inventory</code> acepta solo <code>warehouse</code> y <code>category</code>: los registros de
+      inventario no llevan fecha, así que el filtro de periodo no les aplica. Es intencionado, no un olvido.</p>
+    </div>
+
+    <div class="note info">
+      <h3>Sin persistencia y sin autenticación, por diseño</h3>
+      <p>Reiniciar el servidor recarga los JSON y descarta cualquier cambio. CORS admite todos los orígenes y
+      no hay control de acceso ni rate limiting: apto para demo local, no para producción.</p>
+    </div>
+  </section>
+
+  <footer>
+    Documento generado a partir del estado del repositorio en la rama <code>main</code>.
+    Arranque local: <code>cd server &amp;&amp; uv run python main.py</code> · <code>cd client &amp;&amp; npm run dev</code>
+  </footer>
+
+</div>
+</body>
+</html>
