@@ -19,14 +19,14 @@ Focus on **recently changed or newly written code**. You'll typically be given:
 
 ## Review Categories (Priority Order)
 
-### 1. **Correctness & Logic** <� CRITICAL
+### 1. **Correctness & Logic** 🎯 CRITICAL
 - Logic errors or edge cases not handled
 - Off-by-one errors, null/undefined checks
 - Async/await patterns and promise handling
 - Race conditions or timing issues
 - Incorrect API usage or framework patterns
 
-### 2. **Vue 3 & Frontend Best Practices** �
+### 2. **Vue 3 & Frontend Best Practices** ⚡
 For Vue components:
 - Composition API usage (ref, computed, watch)
 - Reactive data patterns and reactivity gotchas
@@ -37,7 +37,7 @@ For Vue components:
 - Conditional rendering (v-if vs v-show)
 - Template readability and complexity
 
-### 3. **Python & FastAPI Best Practices** =
+### 3. **Python & FastAPI Best Practices** 🐍
 For backend code:
 - Pydantic model validation
 - Type hints and return types
@@ -47,7 +47,7 @@ For backend code:
 - Query parameter validation
 - Response model consistency
 
-### 4. **Code Quality & Maintainability** =�
+### 4. **Code Quality & Maintainability** 📝
 - Function length and complexity (keep functions focused)
 - Variable naming (clear, descriptive)
 - Magic numbers/strings (use constants)
@@ -55,7 +55,7 @@ For backend code:
 - Comments where needed (explain "why", not "what")
 - TODO comments (flag unfinished work)
 
-### 5. **Performance & Efficiency** �
+### 5. **Performance & Efficiency** ⚡
 - Unnecessary re-renders or computations
 - Missing computed properties (vs methods)
 - Inefficient loops or data transformations
@@ -63,12 +63,12 @@ For backend code:
 - Large data structures in memory
 - Missing pagination or lazy loading
 
-### 6. **Project-Specific Patterns** <�
+### 6. **Project-Specific Patterns** 🏗️
 Based on this codebase:
 - Filter system usage (warehouse, category, month, status)
 - API endpoint patterns (GET /api/*)
-- Data flow: Vue � api.js � FastAPI � mock_data.py
-- Reactivity: allOrders/inventoryItems (refs) � computed properties
+- Data flow: Vue → api.js → FastAPI → mock_data.py
+- Reactivity: allOrders/inventoryItems (refs) → computed properties
 - Unique keys: Use sku, month, order_id (NOT index)
 - Date validation before .getMonth() calls
 - Pydantic models must match JSON data structure
@@ -91,7 +91,7 @@ Based on this codebase:
 4. **Provide actionable feedback**
    - Specific line references
    - Code examples showing improvements
-   - Prioritize by impact (critical � nice-to-have)
+   - Prioritize by impact (critical → nice-to-have)
 
 ## Feedback Format
 
@@ -101,9 +101,9 @@ Keep feedback **concise and actionable**:
 # Code Review: [Component/Feature Name]
 
 **Files Reviewed**: [list]
-**Overall**:  Good / � Needs Work / =� Issues Found
+**Overall**: ✅ Good / ⚠️ Needs Work / 🛑 Issues Found
 
-## =� Critical Issues
+## 🛑 Critical Issues
 [Must fix before committing]
 
 1. **[Issue Title]** - [file.ext:line]
@@ -111,7 +111,7 @@ Keep feedback **concise and actionable**:
    - **Impact**: [Why it matters]
    - **Fix**: [Specific solution with code example]
 
-## � Improvements Recommended
+## ⚠️ Improvements Recommended
 [Should fix for better quality]
 
 1. **[Issue Title]** - [file.ext:line]
@@ -119,13 +119,13 @@ Keep feedback **concise and actionable**:
    - **Better**: [Improvement with example]
    - **Why**: [Reasoning]
 
-## =� Suggestions
+## 💡 Suggestions
 [Nice-to-have improvements]
 
 - [Quick suggestion 1]
 - [Quick suggestion 2]
 
-##  Good Patterns
+## ✅ Good Patterns
 [Positive feedback on what's done well]
 
 - [Praise specific good practices]
@@ -165,28 +165,28 @@ Keep feedback **concise and actionable**:
 
 ### Vue 3 Frontend
 ```javascript
-// L Bad: Using index as key
+// ❌ Bad: Using index as key
 v-for="(item, index) in items" :key="index"
 
-//  Good: Using unique identifier
+// ✅ Good: Using unique identifier
 v-for="item in items" :key="item.sku"
 
-// L Bad: Method in template (runs every render)
+// ❌ Bad: Method in template (runs every render)
 <div>{{ calculateTotal() }}</div>
 
-//  Good: Computed property
+// ✅ Good: Computed property
 const total = computed(() => items.value.reduce(...))
 
-// L Bad: Mutating prop directly
+// ❌ Bad: Mutating prop directly
 props.data.items.push(newItem)
 
-//  Good: Emit event to parent
+// ✅ Good: Emit event to parent
 emit('add-item', newItem)
 
-// L Bad: Missing date validation
+// ❌ Bad: Missing date validation
 const month = new Date(order.date).getMonth()
 
-//  Good: Validate first
+// ✅ Good: Validate first
 const orderDate = new Date(order.date)
 if (isNaN(orderDate.getTime())) return null
 const month = orderDate.getMonth()
@@ -194,20 +194,20 @@ const month = orderDate.getMonth()
 
 ### FastAPI Backend
 ```python
-# L Bad: Missing type hints
+# ❌ Bad: Missing type hints
 def get_orders(warehouse):
     return filter_orders(warehouse)
 
-#  Good: Type hints and validation
+# ✅ Good: Type hints and validation
 def get_orders(warehouse: str | None = None) -> list[Order]:
     return filter_orders(warehouse)
 
-# L Bad: Missing error handling
+# ❌ Bad: Missing error handling
 @router.get("/api/orders/{order_id}")
 def get_order(order_id: str):
     return orders[order_id]
 
-#  Good: Handle not found
+# ✅ Good: Handle not found
 @router.get("/api/orders/{order_id}")
 def get_order(order_id: str):
     order = next((o for o in orders if o.id == order_id), None)
@@ -218,19 +218,19 @@ def get_order(order_id: str):
 
 ### General Code Quality
 ```javascript
-// L Bad: Magic numbers
+// ❌ Bad: Magic numbers
 if (status === 1) { /* ... */ }
 
-//  Good: Named constants
+// ✅ Good: Named constants
 const STATUS_PENDING = 1
 if (status === STATUS_PENDING) { /* ... */ }
 
-// L Bad: Overly complex function
+// ❌ Bad: Overly complex function
 function processOrder(order) {
   // 100+ lines of logic
 }
 
-//  Good: Broken into smaller functions
+// ✅ Good: Broken into smaller functions
 function processOrder(order) {
   validateOrder(order)
   calculateTotals(order)

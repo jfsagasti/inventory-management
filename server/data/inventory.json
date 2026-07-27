@@ -307,7 +307,7 @@
     "warehouse": "London",
     "quantity_on_hand": 350,
     "reorder_point": 200,
-    "unit_cost": 22.50,
+    "unit_cost": 22.5,
     "location": "Warehouse B-16",
     "last_updated": "2025-09-27T13:20:00"
   },
@@ -326,7 +326,7 @@
   {
     "id": "28",
     "sku": "PSU-504",
-    "name": "Dual Output ±15V Power Supply",
+    "name": "Dual Output \u00b115V Power Supply",
     "category": "Power Supplies",
     "warehouse": "San Francisco",
     "quantity_on_hand": 190,
@@ -343,7 +343,7 @@
     "warehouse": "London",
     "quantity_on_hand": 145,
     "reorder_point": 120,
-    "unit_cost": 67.50,
+    "unit_cost": 67.5,
     "location": "Warehouse B-17",
     "last_updated": "2025-09-24T09:00:00"
   },
@@ -367,7 +367,7 @@
     "warehouse": "San Francisco",
     "quantity_on_hand": 95,
     "reorder_point": 80,
-    "unit_cost": 125.00,
+    "unit_cost": 125.0,
     "location": "Warehouse A-17",
     "last_updated": "2025-09-22T11:30:00"
   },
@@ -379,8 +379,104 @@
     "warehouse": "Tokyo",
     "quantity_on_hand": 75,
     "reorder_point": 100,
-    "unit_cost": 185.50,
+    "unit_cost": 185.5,
     "location": "Warehouse C-11",
     "last_updated": "2025-09-21T15:20:00"
+  },
+  {
+    "id": "33",
+    "sku": "WDG-001",
+    "name": "Industrial Widget Type A",
+    "category": "Actuators",
+    "warehouse": "San Francisco",
+    "quantity_on_hand": 180,
+    "reorder_point": 200,
+    "unit_cost": 12.5,
+    "location": "Warehouse A-17",
+    "last_updated": "2025-09-29T09:15:00"
+  },
+  {
+    "id": "34",
+    "sku": "BRG-102",
+    "name": "Steel Bearing Assembly",
+    "category": "Actuators",
+    "warehouse": "London",
+    "quantity_on_hand": 140,
+    "reorder_point": 100,
+    "unit_cost": 45.0,
+    "location": "Warehouse B-15",
+    "last_updated": "2025-09-27T11:40:00"
+  },
+  {
+    "id": "35",
+    "sku": "GSK-203",
+    "name": "High-Temperature Gasket",
+    "category": "Actuators",
+    "warehouse": "Tokyo",
+    "quantity_on_hand": 320,
+    "reorder_point": 350,
+    "unit_cost": 8.75,
+    "location": "Warehouse C-08",
+    "last_updated": "2025-09-30T08:05:00"
+  },
+  {
+    "id": "36",
+    "sku": "MTR-304",
+    "name": "Electric Motor 5HP",
+    "category": "Actuators",
+    "warehouse": "Tokyo",
+    "quantity_on_hand": 68,
+    "reorder_point": 40,
+    "unit_cost": 389.0,
+    "location": "Warehouse C-09",
+    "last_updated": "2025-09-26T15:20:00"
+  },
+  {
+    "id": "37",
+    "sku": "FLT-405",
+    "name": "Oil Filter Cartridge",
+    "category": "Actuators",
+    "warehouse": "San Francisco",
+    "quantity_on_hand": 540,
+    "reorder_point": 600,
+    "unit_cost": 22.4,
+    "location": "Warehouse A-18",
+    "last_updated": "2025-09-30T13:50:00"
+  },
+  {
+    "id": "38",
+    "sku": "VLV-506",
+    "name": "Pressure Relief Valve",
+    "category": "Actuators",
+    "warehouse": "London",
+    "quantity_on_hand": 95,
+    "reorder_point": 90,
+    "unit_cost": 67.9,
+    "location": "Warehouse B-16",
+    "last_updated": "2025-09-28T10:10:00"
+  },
+  {
+    "id": "39",
+    "sku": "SNR-420",
+    "name": "Temperature Sensor Module",
+    "category": "Sensors",
+    "warehouse": "London",
+    "quantity_on_hand": 210,
+    "reorder_point": 120,
+    "unit_cost": 34.25,
+    "location": "Warehouse B-17",
+    "last_updated": "2025-09-29T16:30:00"
+  },
+  {
+    "id": "40",
+    "sku": "CTL-330",
+    "name": "Logic Controller Board",
+    "category": "Controllers",
+    "warehouse": "San Francisco",
+    "quantity_on_hand": 88,
+    "reorder_point": 90,
+    "unit_cost": 128.0,
+    "location": "Warehouse A-19",
+    "last_updated": "2025-09-30T07:45:00"
   }
 ]

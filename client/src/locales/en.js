@@ -6,6 +6,7 @@ export default {
     orders: 'Orders',
     finance: 'Finance',
     demandForecast: 'Demand Forecast',
+    restocking: 'Restocking',
     companyName: 'Catalyst Components',
     subtitle: 'Inventory Management System'
   },
@@ -125,8 +126,61 @@ export default {
       totalValue: 'Total Value',
       status: 'Status',
       expectedDelivery: 'Expected Delivery',
-      actualDelivery: 'Actual Delivery'
+      actualDelivery: 'Actual Delivery',
+      leadTime: 'Lead Time'
+    },
+    submitted: {
+      title: 'Submitted Orders',
+      description: 'Restocking orders submitted from the Restocking tab',
+      empty: 'No restocking orders submitted yet.',
+      leadTimeDays: '{days} days'
     }
+  },
+
+  // Restocking
+  restocking: {
+    title: 'Restocking',
+    description: 'Set a budget and restock the items your demand forecast needs most',
+    budget: {
+      label: 'Available budget',
+      hint: 'Drag to set how much you can spend on this restocking order',
+      coverAll: 'Cover everything'
+    },
+    summary: {
+      allocated: 'Allocated',
+      remaining: 'Remaining',
+      itemsSelected: 'Items selected',
+      totalUnits: 'Total units'
+    },
+    recommended: {
+      title: 'Recommended to restock',
+      empty: 'No items fit this budget yet. Increase it to see recommendations.',
+      allCovered: 'Every forecast item is already stocked above its needs.'
+    },
+    excluded: {
+      title: 'Left out of this budget',
+      description: 'These items still need restocking but do not fit the budget',
+      needed: 'Needs {amount} more'
+    },
+    table: {
+      sku: 'SKU',
+      item: 'Item',
+      category: 'Category',
+      warehouse: 'Warehouse',
+      trend: 'Trend',
+      onHand: 'On Hand',
+      reorderPoint: 'Reorder Point',
+      forecast: 'Forecast',
+      quantity: 'Restock Qty',
+      unitCost: 'Unit Cost',
+      lineCost: 'Line Cost',
+      leadTime: 'Lead Time'
+    },
+    placeOrder: 'Place Order',
+    placing: 'Placing order...',
+    success: 'Order {orderNumber} submitted. Expected delivery in {days} days.',
+    error: 'Could not submit the restocking order',
+    belowReorderPoint: 'Below reorder point'
   },
 
   // Finance/Spending
